@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  <title>GeoData</title>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand py-auto" href="#">
+        <img src="{{ url_for('static', filename='/img/globe.png') }}" alt="" width="30" height="30"
+          class="d-inline-block align-text-top">
+        GeoData
+      </a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <p class="my-4 h5">
+      Api Endpoints
+    </p>
+    <ol class="list-group">
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Get Contries</div>
+          /api/geoData/
+        </div>
+        <a href="/api/geoData/" target="_blank" class="btn btn-outline-primary">Try it</a>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Get States</div>
+          /api/geoData/&lt;Country_Code&gt;
+        </div>
+        <a href="/api/geoData/IN" target="_blank" class="btn btn-outline-primary">Try it</a>
+      </li>
+      <li class="list-group-item d-flex justify-content-between align-items-start">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold">Get Cities</div>
+          /api/geoData/&lt;Country_Code&gt;/&lt;State_Code&gt;
+        </div>
+        <a href="/api/geoData/IN/MH" target="_blank" class="btn btn-outline-primary">Try it</a>
+      </li>
+    </ol>
+  </div>
+
+  <div class="container rounded-3 shadow-sm px-4 pb-4 pt-2 mt-4 ">
+    <p class="my-4 h5">
+      Country State City Selector
+    </p>
+    <div class="row">
+
+      <div class="col">
+        <select id="country" class="form-select">
+          <option disabled selected>Select Country</option>
+        </select>
+      </div>
+      <div class="col">
+        <select id="state" class="form-select">
+          <option disabled selected>Select State</option>
+        </select>
+      </div>
+      <div class="col">
+        <select id="city" class="form-select">
+          <option disabled selected>Select City</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+</body>
+<script>
+
+  getCountries();
+
+  document.getElementById("country").addEventListener('change', (e) => {
+    getStates(document.getElementById("country").value)
+  });
+
+  document.getElementById("state").addEventListener('change', (e) => {
+    getStates(document.getElementById("country").value, document.getElementById("state").value)
+  });
+
+
+  // get Country 
+  async function getCountries() {
+    let url = '/api/geoData/';
+    try {
+      let res = await fetch(url);
+      var result = await res.json();
+      document.getElementById("country").innerHTML = ''
+
+      result.forEach(c => {
+        let opt = document.createElement('option');
+        opt.value = c['iso2'];
+        opt.innerHTML = c['name'];
+        document.getElementById("country").appendChild(opt)
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // get States 
+  async function getStates(CCode) {
+    let url = '/api/geoData/' + CCode;
+    try {
+      let res = await fetch(url);
+      var result = await res.json();
+      document.getElementById("state").innerHTML = ''
+
+      result.forEach(c => {
+        let opt = document.createElement('option');
+        opt.value = c['state_code'];
+        opt.innerHTML = c['name'];
+        document.getElementById("state").appendChild(opt)
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // get Cities 
+  async function getCities(CCode, SCode) {
+    let url = '/api/geoData/' + CCode + '/' + SCode;
+    try {
+      let res = await fetch(url);
+      var result = await res.json();
+      document.getElementById("city").innerHTML = ''
+
+      result.forEach(c => {
+        let opt = document.createElement('option');
+        opt.value = c['name'];
+        opt.innerHTML = c['name'];
+        document.getElementById("city").appendChild(opt)
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
+</script>
+
+</html>
